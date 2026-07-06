@@ -1,0 +1,15 @@
+# Security / Environment Variables
+.env
+
+# Python Compiled Files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Mac OS (if anyone ever uses a Mac)
+.DS_Store
+
+# (Optional) If your 'data/' or 'assets/' folders hold massive files, 
+# you can ignore them by uncommenting the lines below:
+# data/
+# assets/
