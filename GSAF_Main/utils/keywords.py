@@ -99,3 +99,36 @@ CALCULATOR_HEADING_KEYWORDS = [
     "calculate", "estimate", "find your",
     "how much", "compare"
 ]
+
+
+CONTACT_KEYWORDS = [
+    "contact",
+    "contact us",
+    "support",
+    "help",
+    "reach us",
+    "get in touch",
+]
+
+ADDRESS_KEYWORDS = [
+    "address",
+    "office",
+    "location",
+    "head office",
+]
+
+SITEMAP_KEYWORDS = [
+    "sitemap",
+    "site map",
+]
+
+PRIVACY_KEYWORDS = [
+    "privacy",
+    "privacy policy",
+]
+
+TERMS_KEYWORDS = [
+    "terms",
+    "terms of service",
+    "terms and conditions",
+]
