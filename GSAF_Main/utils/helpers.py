@@ -4,9 +4,10 @@ from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 from models.site_data import SiteData
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env")
 
 OPR_API_KEY = os.getenv("OPR_API_KEY")
 OPR_API_URL = "https://openpagerank.com/api/v1.0/getPageRank"
