@@ -26,37 +26,36 @@ def run(site_data):
         signals_found = [phrase for phrase in ORIGINALITY_PHRASES if phrase in text]
         stat_matches = STAT_PATTERN.findall(soup.get_text())
 
-        title_tag = soup.find("title")
-        meta_desc = soup.find("meta", attrs={"name": "description"})
-
-        title = title_tag.get_text(strip=True) if title_tag else ""
-        meta = meta_desc["content"] if meta_desc and meta_desc.get("content") else ""
-
         result.details["originality_phrases_found"] = signals_found
         result.details["statistics_found"] = stat_matches[:5]
-        result.details["title"] = title
-        result.details["meta_description"] = meta
-        result.details["ai_judgment_pending"] = True
-        result.details["note"] = (
-            "Rule-based originality signals extracted. "
-            "AI originality judgment (High/Medium/Low) will be added via ai_batch."
-        )
 
         if len(signals_found) >= 3 and stat_matches:
-            result.score = 80
+            base_score = 80
         elif signals_found and stat_matches:
-            result.score = 60
+            base_score = 60
         elif signals_found or stat_matches:
-            result.score = 40
+            base_score = 40
         else:
-            result.score = 10
+            base_score = 10
+
+        ai_data = site_data.ai_results.get("metric_65", {})
+        if ai_data:
+            originality = ai_data.get("originality", "").lower()
+            result.details["ai_originality_rating"] = originality
+            result.details["ai_reasoning"] = ai_data.get("reasoning", "")
+            originality_bonus = {"high": 20, "medium": 10, "low": 0}.get(originality, 0)
+            result.score = min(100, base_score + originality_bonus)
+        else:
+            result.score = base_score
+
+        result.status = get_status(result.score)
+
+        if not signals_found and not stat_matches:
             result.recommendations.append(
                 "No original research signals detected. "
                 "Adding proprietary data, surveys, or first-hand findings significantly "
                 "improves AI answer engine citation likelihood."
             )
-
-        result.status = get_status(result.score)
 
     except Exception as e:
         result.error = str(e)

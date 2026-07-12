@@ -9,14 +9,12 @@ def run(site_data):
     try:
         soup = site_data.soup
         all_links = soup.find_all("a", href=True)
-
         external_links = [a["href"] for a in all_links if a["href"].startswith("http")]
 
         authoritative_found = [
             link for link in external_links
             if any(d in link for d in AUTHORITATIVE_DOMAINS)
         ]
-
         moderate_found = [
             link for link in external_links
             if any(d in link for d in MODERATE_DOMAINS)
@@ -26,24 +24,28 @@ def run(site_data):
         result.details["total_external_links"] = len(external_links)
         result.details["authoritative_links"] = authoritative_found
         result.details["authoritative_count"] = len(authoritative_found)
-        result.details["moderate_links"] = moderate_found[:5]
         result.details["moderate_count"] = len(moderate_found)
-        result.details["ai_judgment_pending"] = True
-        result.details["note"] = (
-            "Rule-based citation check complete. "
-            "AI quality judgment for borderline sources will be added via ai_batch."
-        )
 
         if len(authoritative_found) >= 3:
-            result.score = 80
+            base_score = 80
         elif len(authoritative_found) >= 1:
-            result.score = 50
+            base_score = 50
         elif len(moderate_found) >= 2:
-            result.score = 30
+            base_score = 30
         elif external_links:
-            result.score = 10
+            base_score = 10
         else:
-            result.score = 0
+            base_score = 0
+
+        ai_data = site_data.ai_results.get("metric_63", {})
+        if ai_data:
+            quality = ai_data.get("citation_quality", "").lower()
+            result.details["ai_citation_quality"] = quality
+            result.details["ai_reasoning"] = ai_data.get("reasoning", "")
+            quality_bonus = {"high": 20, "medium": 10, "low": 0}.get(quality, 0)
+            result.score = min(100, base_score + quality_bonus)
+        else:
+            result.score = base_score
 
         result.status = get_status(result.score)
 

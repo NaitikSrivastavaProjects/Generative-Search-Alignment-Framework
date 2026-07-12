@@ -1,6 +1,7 @@
 import importlib.util
 from pathlib import Path
 from utils.helpers import build_site_data
+from utils.ai_batch import run_ai_batch
 
 
 PLUGINS_DIR = Path(__file__).resolve().parent / "plugins"
@@ -9,17 +10,14 @@ PLUGINS_DIR = Path(__file__).resolve().parent / "plugins"
 def load_plugins():
     plugins = []
 
-    # walk through every cluster folder inside plugins/
     for cluster in PLUGINS_DIR.iterdir():
         if not cluster.is_dir():
             continue
 
-        # walk through every metric folder inside the cluster
         for metric_folder in cluster.iterdir():
             if not metric_folder.is_dir():
                 continue
 
-            # look for the main_metric_XX.py file inside the metric folder
             for file in metric_folder.glob("main_metric_*.py"):
                 spec = importlib.util.spec_from_file_location(file.stem, file)
                 module = importlib.util.module_from_spec(spec)
@@ -35,6 +33,9 @@ def load_plugins():
 
 def run_analysis(url, keyword="", keywords=None, competitor_url=""):
     site_data = build_site_data(url, keyword, keywords, competitor_url)
+
+    # run AI batch once before all plugins so ai_results are ready
+    site_data.ai_results = run_ai_batch(site_data)
 
     plugins = load_plugins()
     results = []
