@@ -6,6 +6,7 @@ from models.site_data import SiteData
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+from urllib.parse import urljoin
 
 load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env")
 
@@ -76,3 +77,31 @@ def build_site_data(url, keyword="", keywords=None, competitor_url=""):
         ai_results={},
         opr_data=opr_data
     )
+
+def extract_text(element):
+    if element is None:
+        return ""
+    return element.get_text(separator=" ", strip=True)
+
+def get_link_target(base_url, href):
+    if not href:
+        return ""
+    return urljoin(base_url, href)
+
+def get_links(soup):
+    return soup.find_all("a", href=True)
+
+def get_images(soup):
+    return soup.find_all("img")
+
+def get_forms(soup):
+    return soup.find_all("form")
+
+def get_meta_tags(soup):
+    return soup.find_all("meta")
+
+def find_meta(soup, name):
+    return soup.find("meta", attrs={"name": name})
+
+def find_nav(soup):
+    return soup.find("nav")
