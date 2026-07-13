@@ -9,6 +9,7 @@ PLUGINS_DIR = Path(__file__).resolve().parent / "plugins"
 
 def load_plugins():
     plugins = []
+    loaded_names = set()
 
     for cluster in PLUGINS_DIR.iterdir():
         if not cluster.is_dir():
@@ -19,11 +20,19 @@ def load_plugins():
                 continue
 
             for file in metric_folder.glob("main_metric_*.py"):
+                if file.name in loaded_names:
+                    print(f"Duplicate skipped: {file}")
+                    continue
+
+                loaded_names.add(file.name)
                 spec = importlib.util.spec_from_file_location(file.stem, file)
                 module = importlib.util.module_from_spec(spec)
+
                 try:
                     spec.loader.exec_module(module)
                     if hasattr(module, "run"):
+                        # attach cluster name directly to module
+                        module._cluster = cluster.name
                         plugins.append(module)
                 except Exception as e:
                     print(f"Failed to load {file.name}: {e}")
@@ -34,7 +43,6 @@ def load_plugins():
 def run_analysis(url, keyword="", keywords=None, competitor_url=""):
     site_data = build_site_data(url, keyword, keywords, competitor_url)
 
-    # run AI batch once before all plugins so ai_results are ready
     site_data.ai_results = run_ai_batch(site_data)
 
     plugins = load_plugins()
@@ -43,6 +51,8 @@ def run_analysis(url, keyword="", keywords=None, competitor_url=""):
     for plugin in plugins:
         try:
             result = plugin.run(site_data)
+            # inject cluster name into result so controller can use it
+            result["_cluster"] = getattr(plugin, "_cluster", "other")
             results.append(result)
         except Exception as e:
             results.append({
@@ -51,7 +61,8 @@ def run_analysis(url, keyword="", keywords=None, competitor_url=""):
                 "status": "Error",
                 "details": {},
                 "recommendations": [],
-                "error": str(e)
+                "error": str(e),
+                "_cluster": getattr(plugin, "_cluster", "other")
             })
 
     return results
@@ -67,6 +78,7 @@ if __name__ == "__main__":
         print(f"\n{result['factor']}")
         print(f"  Score  : {result['score']}")
         print(f"  Status : {result['status']}")
+        print(f"  Cluster: {result['_cluster']}")
         if result.get("recommendations"):
             for rec in result["recommendations"]:
                 print(f"  → {rec}")

@@ -17,8 +17,34 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_methods=["*"],
-    allow_headers=["*"]
+    allow_headers=["*"],
+    allow_credentials=True
 )
+
+# maps folder names to clean display names for the frontend
+CLUSTER_DISPLAY_NAMES = {
+    "analytics": "Analytics",
+    "architecture": "Architecture",
+    "brand_footprint": "Brand Footprint",
+    "contact": "Contact",
+    "content__structure": "Content Structure",
+    "content_format_multimedia": "Content Format & Multimedia",
+    "content_strategy": "Content Strategy",
+    "content_structure": "Content Structure",
+    "eeat_answer_trust": "E-E-A-T & Answer Trust",
+    "engagement_behavioral": "Engagement & Behavioral",
+    "entity_knowledge_graph": "Entity & Knowledge Graph",
+    "freshness_maintenance": "Freshness & Maintenance",
+    "offsite_webspam": "Off-Site Webspam",
+    "rag_optimization": "RAG Optimization",
+    "reputation": "Reputation",
+    "schema": "Schema & Structured Data",
+    "security": "Security",
+    "sitemap": "Sitemap",
+    "technical_foundations": "Technical Foundations",
+    "trust": "Trust",
+    "usability": "Usability",
+}
 
 
 class AnalyzeRequest(BaseModel):
@@ -27,6 +53,10 @@ class AnalyzeRequest(BaseModel):
     keywords: Optional[str] = ""
     competitor_url: Optional[str] = ""
     fast_mode: Optional[bool] = True
+
+
+def get_display_category(cluster_name: str) -> str:
+    return CLUSTER_DISPLAY_NAMES.get(cluster_name.lower(), cluster_name.replace("_", " ").title())
 
 
 def map_status(status: str) -> str:
@@ -41,35 +71,9 @@ def map_status(status: str) -> str:
     return mapping.get(status, "Informational")
 
 
-def get_category_from_factor(factor: str) -> str:
-    factor_num_str = ''.join(filter(str.isdigit, factor.split('-')[0]))
-    try:
-        num = int(factor_num_str)
-    except ValueError:
-        return "Other"
-
-    if 51 <= num <= 60:
-        return "Entity & Knowledge Graph"
-    elif 61 <= num <= 70:
-        return "E-E-A-T & Answer Trust"
-    elif 71 <= num <= 78:
-        return "Content Format & Multimedia"
-    elif 79 <= num <= 89:
-        return "Technical Foundations"
-    elif 90 <= num <= 95:
-        return "Freshness & Maintenance"
-    elif 96 <= num <= 100:
-        return "Engagement & Behavioral"
-    elif 183 <= num <= 196:
-        return "Off-Site Webspam"
-    return "Other"
-
-
 def build_assessment(result: dict) -> str:
     score = result.get("score")
-    status = result.get("status", "")
     factor = result.get("factor", "")
-
     if score is None:
         return f"{factor} could not be automatically assessed for this page."
     if score >= 75:
@@ -106,7 +110,7 @@ def build_structured_recommendations(raw_results: list) -> list:
                 "seo_impact": impact,
                 "geo_impact": impact,
                 "difficulty": "Easy" if score and score >= 40 else "Hard",
-                "business_impact": f"Improving this metric could significantly boost search and AI engine visibility.",
+                "business_impact": "Improving this metric could significantly boost search and AI engine visibility.",
                 "suggested_next_action": rec,
                 "implementation_details": f"Review and address the issue flagged under {factor}."
             })
@@ -161,25 +165,27 @@ def analyze(request: AnalyzeRequest):
         )
         elapsed = round((time.time() - start) * 1000)
 
-        # shape each result to match MetricResult type
         shaped_results = []
         for r in raw_results:
+            cluster = r.get("_cluster", "other")
+            category = get_display_category(cluster)
+
             shaped_results.append({
                 "factor": r.get("factor", "Unknown"),
                 "score": r.get("score"),
                 "status": map_status(r.get("status", "Informational")),
-                "category": get_category_from_factor(r.get("factor", "")),
+                "category": category,
                 "assessment": build_assessment(r),
                 "recommendations": r.get("recommendations", []),
                 "details": r.get("details", {}),
                 "execution_time_ms": elapsed
             })
 
-        # calculate overall score from all scored metrics
+        # calculate overall score
         scored = [r["score"] for r in shaped_results if r["score"] is not None]
         overall_score = round(sum(scored) / len(scored)) if scored else 0
 
-        # calculate per-category average scores
+        # calculate per-category scores dynamically from actual cluster names
         category_scores = {}
         category_counts = {}
         for r in shaped_results:
@@ -187,6 +193,7 @@ def analyze(request: AnalyzeRequest):
             if r["score"] is not None:
                 category_scores[cat] = category_scores.get(cat, 0) + r["score"]
                 category_counts[cat] = category_counts.get(cat, 0) + 1
+
         categories = {
             cat: round(category_scores[cat] / category_counts[cat])
             for cat in category_scores
@@ -211,7 +218,6 @@ def analyze(request: AnalyzeRequest):
 
 @app.post("/api/suggest-competitors")
 def suggest_competitors(request: dict):
-    # placeholder — can be enhanced later
     url = request.get("url", "")
     return {
         "suggestions": [
