@@ -1,5 +1,5 @@
 """
-Factor 107
+Factor 220
 
 Site Usability
 """
@@ -12,7 +12,7 @@ class SiteUsabilityPlugin(BaseSEOPlugin):
 
     @property
     def factor(self):
-        return "107 - Site Usability"
+        return "220 - Site Usability"
 
     def run(self):
         result = self.create_result()

@@ -1,5 +1,5 @@
 """
-Factor 102
+Factor 215
 
 Terms of Service & Privacy Pages
 """
@@ -13,7 +13,7 @@ class TermsPrivacyPlugin(BaseSEOPlugin):
 
     @property
     def factor(self):
-        return "102 - Terms of Service & Privacy Pages"
+        return "215 - Terms of Service & Privacy Pages"
 
     def run(self):
         result = self.create_result()

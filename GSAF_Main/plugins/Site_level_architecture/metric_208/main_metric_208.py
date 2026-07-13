@@ -1,5 +1,5 @@
 """
-Factor 96
+Factor 208
 
 Site Architecture
 """
@@ -12,7 +12,7 @@ class SiteArchitecturePlugin(BaseSEOPlugin):
 
     @property
     def factor(self):
-        return "96 - Site Architecture"
+        return "208- Site Architecture"
 
     def run(self):
         result = self.create_result()

@@ -1,5 +1,5 @@
 """
-Factor 101
+Factor 214
 
 SSL Certificate / HTTPS
 """
@@ -12,7 +12,7 @@ class SSLCertificatePlugin(BaseSEOPlugin):
 
     @property
     def factor(self):
-        return "101 - SSL Certificate"
+        return "214 - SSL Certificate"
 
     def run(self):
         result = self.create_result()

@@ -1,5 +1,5 @@
 """
-Factor 103
+Factor 216
 
 Duplicate Meta Information
 """
@@ -14,7 +14,7 @@ class DuplicateMetaPlugin(BaseSEOPlugin):
 
     @property
     def factor(self):
-        return "103 - Duplicate Meta Information"
+        return "216 - Duplicate Meta Information"
 
     def run(self):
         result = self.create_result()

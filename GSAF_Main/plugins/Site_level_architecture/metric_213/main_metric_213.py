@@ -1,5 +1,5 @@
 """
-Factor 100
+Factor 213
 
 Server Location
 """
@@ -13,7 +13,7 @@ class ServerLocationPlugin(BaseSEOPlugin):
 
     @property
     def factor(self):
-        return "100 - Server Location"
+        return "213 - Server Location"
 
     def run(self):
         result = self.create_result()

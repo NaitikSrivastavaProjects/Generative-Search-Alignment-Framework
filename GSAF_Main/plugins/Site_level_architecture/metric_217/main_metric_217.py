@@ -1,5 +1,5 @@
 """
-Factor 104
+Factor 217
 
 Breadcrumb Navigation
 """
@@ -11,7 +11,7 @@ class BreadcrumbNavigationPlugin(BaseSEOPlugin):
 
     @property
     def factor(self):
-        return "104 - Breadcrumb Navigation"
+        return "217 - Breadcrumb Navigation"
 
     def run(self):
         result = self.create_result()

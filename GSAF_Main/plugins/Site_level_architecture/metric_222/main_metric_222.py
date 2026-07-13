@@ -1,5 +1,5 @@
 """
-Factor 108
+Factor 222
 
 Google Analytics & Search Console
 """
@@ -11,7 +11,7 @@ class GoogleAnalyticsPlugin(BaseSEOPlugin):
 
     @property
     def factor(self):
-        return "108 - Google Analytics & Search Console"
+        return "222 - Google Analytics & Search Console"
 
     def run(self):
         result = self.create_result()

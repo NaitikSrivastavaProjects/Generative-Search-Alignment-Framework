@@ -1,5 +1,5 @@
 """
-Factor 99
+Factor 212
 
 Site Uptime
 """
@@ -11,7 +11,7 @@ class SiteUptimePlugin(BaseSEOPlugin):
 
     @property
     def factor(self):
-        return "99 - Site Uptime"
+        return "212- Site Uptime"
 
     def run(self):
         result = self.create_result()

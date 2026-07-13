@@ -1,5 +1,5 @@
 """
-Factor 105
+Factor 218
 
 Mobile Optimization
 """
@@ -12,7 +12,7 @@ class MobileOptimizationPlugin(BaseSEOPlugin):
 
     @property
     def factor(self):
-        return "105 - Mobile Optimization"
+        return "218 - Mobile Optimization"
 
     def run(self):
         result = self.create_result()

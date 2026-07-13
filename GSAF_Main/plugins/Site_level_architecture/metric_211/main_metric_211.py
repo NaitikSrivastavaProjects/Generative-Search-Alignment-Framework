@@ -13,7 +13,7 @@ class SitemapAvailabilityPlugin(BaseSEOPlugin):
 
     @property
     def factor(self):
-        return "98 - Sitemap Availability"
+        return "211 - Sitemap Availability"
 
     def run(self):
         result = self.create_result()

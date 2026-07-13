@@ -1,5 +1,5 @@
 """
-Factor 109
+Factor 221
 
 User Reviews / Site Reputation
 """
@@ -12,7 +12,7 @@ class SiteReputationPlugin(BaseSEOPlugin):
 
     @property
     def factor(self):
-        return "109 - Site Reputation"
+        return "221 - Site Reputation"
 
     def run(self):
         result = self.create_result()
