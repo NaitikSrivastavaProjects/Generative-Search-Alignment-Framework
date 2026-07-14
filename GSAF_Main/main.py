@@ -11,11 +11,11 @@ def load_plugins():
     plugins = []
     loaded_names = set()
 
-    for cluster in PLUGINS_DIR.iterdir():
+    for cluster in sorted(PLUGINS_DIR.iterdir()):
         if not cluster.is_dir():
             continue
 
-        for metric_folder in cluster.iterdir():
+        for metric_folder in sorted(cluster.iterdir()):
             if not metric_folder.is_dir():
                 continue
 
@@ -31,18 +31,50 @@ def load_plugins():
                 try:
                     spec.loader.exec_module(module)
                     if hasattr(module, "run"):
-                        # attach cluster name directly to module
                         module._cluster = cluster.name
+                        module._factor = file.stem
                         plugins.append(module)
+                    else:
+                        # file loaded but no run() function
+                        error_msg = f"No run() function found in {file.name}"
+                        print(error_msg)
+                        plugins.append(type('FailedPlugin', (), {
+                            '_cluster': cluster.name,
+                            '_factor': file.stem,
+                            'run': lambda self, sd, msg=error_msg, stem=file.stem, cname=cluster.name: {
+                                "factor": stem,
+                                "score": None,
+                                "status": "Error",
+                                "details": {"error": msg},
+                                "recommendations": [],
+                                "error": msg,
+                                "_cluster": cname
+                            }
+                        })())
+
                 except Exception as e:
-                    print(f"Failed to load {file.name}: {e}")
+                    error_msg = str(e)
+                    print(f"Failed to load {file.name}: {error_msg}")
+                    # still register so cluster appears as a tab
+                    plugins.append(type('FailedPlugin', (), {
+                        '_cluster': cluster.name,
+                        '_factor': file.stem,
+                        'run': lambda self, sd, msg=error_msg, stem=file.stem, cname=cluster.name: {
+                            "factor": stem,
+                            "score": None,
+                            "status": "Error",
+                            "details": {"error": msg},
+                            "recommendations": [],
+                            "error": msg,
+                            "_cluster": cname
+                        }
+                    })())
 
     return plugins
 
 
 def run_analysis(url, keyword="", keywords=None, competitor_url=""):
     site_data = build_site_data(url, keyword, keywords, competitor_url)
-
     site_data.ai_results = run_ai_batch(site_data)
 
     plugins = load_plugins()
@@ -51,15 +83,14 @@ def run_analysis(url, keyword="", keywords=None, competitor_url=""):
     for plugin in plugins:
         try:
             result = plugin.run(site_data)
-            # inject cluster name into result so controller can use it
             result["_cluster"] = getattr(plugin, "_cluster", "other")
             results.append(result)
         except Exception as e:
             results.append({
-                "factor": getattr(plugin, "__name__", "Unknown"),
+                "factor": getattr(plugin, "_factor", "Unknown"),
                 "score": None,
                 "status": "Error",
-                "details": {},
+                "details": {"error": str(e)},
                 "recommendations": [],
                 "error": str(e),
                 "_cluster": getattr(plugin, "_cluster", "other")
@@ -79,7 +110,4 @@ if __name__ == "__main__":
         print(f"  Score  : {result['score']}")
         print(f"  Status : {result['status']}")
         print(f"  Cluster: {result['_cluster']}")
-        if result.get("recommendations"):
-            for rec in result["recommendations"]:
-                print(f"  → {rec}")
     print("\n" + "=" * 60)

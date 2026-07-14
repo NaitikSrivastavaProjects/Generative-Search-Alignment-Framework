@@ -83,7 +83,7 @@ def extract_text(element):
         return ""
     return element.get_text(separator=" ", strip=True)
 
-def get_link_target(base_url, href):
+def get_link_targets(base_url, href):
     if not href:
         return ""
     return urljoin(base_url, href)
