@@ -87,7 +87,7 @@ def run(site_data):
     final_score = min(score, 100)
 
     return MetricResult(
-        factor="Metric 69 - Hreflang",
+        factor="Metric 169 - Hreflang",
         score=final_score,
         status=get_status(final_score),
         details=details,

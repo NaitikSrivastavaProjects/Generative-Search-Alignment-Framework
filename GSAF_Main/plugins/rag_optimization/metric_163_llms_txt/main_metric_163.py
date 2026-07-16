@@ -171,7 +171,7 @@ def run(site_data):
         )
 
     return MetricResult(
-        factor="Metric 63 - LLMs.txt Availability",
+        factor="Metric 163 - LLMs.txt Availability",
         score=min(score, 100),
         status=get_status(min(score, 100)),
         details=details,

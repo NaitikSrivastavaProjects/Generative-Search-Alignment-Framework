@@ -64,6 +64,18 @@ def build_site_data(url, keyword="", keywords=None, competitor_url=""):
     domain = urlparse(url).netloc
     opr_data = fetch_opr_data(domain)
 
+    robots_url = urljoin(url, "/robots.txt")
+    try:
+        robots_response = requests.get(
+            robots_url, 
+            headers={"User-Agent": "Mozilla/5.0 SEO Analyzer Bot"}, 
+            timeout=5
+        )
+        # Only save it if we get a strict 200 OK success
+        robots_txt = robots_response.text if robots_response.status_code == 200 else ""
+    except Exception:
+        robots_txt = ""
+
     return SiteData(
         url=url,
         html=response.text,

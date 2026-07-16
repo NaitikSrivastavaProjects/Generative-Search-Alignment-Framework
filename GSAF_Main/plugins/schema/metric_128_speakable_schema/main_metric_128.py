@@ -1,7 +1,7 @@
 from models.metric_result import MetricResult
 
 def run(site_data):
-    result = MetricResult(factor="28 - Speakable Schema")
+    result = MetricResult(factor="128 - Speakable Schema")
     result.score = 0
     result.status = "Failed"
     result.details = {

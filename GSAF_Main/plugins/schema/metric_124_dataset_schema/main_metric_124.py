@@ -1,7 +1,7 @@
 from models.metric_result import MetricResult
 
 def run(site_data):
-    result = MetricResult(factor="24 - Dataset Schema")
+    result = MetricResult(factor="124 - Dataset Schema")
     result.score = 0
     result.status = "Failed"
     result.details = {

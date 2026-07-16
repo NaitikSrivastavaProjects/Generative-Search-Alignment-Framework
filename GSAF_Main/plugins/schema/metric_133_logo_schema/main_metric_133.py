@@ -1,7 +1,7 @@
 from models.metric_result import MetricResult
 
 def run(site_data):
-    result = MetricResult(factor="33 - Logo Schema")
+    result = MetricResult(factor="133 - Logo Schema")
     result.score = 0
     result.status = "Failed"
     result.details = {

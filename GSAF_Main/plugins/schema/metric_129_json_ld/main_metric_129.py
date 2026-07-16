@@ -1,7 +1,7 @@
 from models.metric_result import MetricResult
 
 def run(site_data):
-    result = MetricResult(factor="29 - JSON-LD Schema Validation")
+    result = MetricResult(factor="129 - JSON-LD Schema Validation")
     result.score = 0
     result.status = "Failed"
     result.details = {

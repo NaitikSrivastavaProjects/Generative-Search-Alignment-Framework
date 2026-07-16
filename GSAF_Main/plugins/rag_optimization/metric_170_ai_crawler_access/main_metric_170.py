@@ -16,7 +16,7 @@ AI_CRAWLERS = [
 
 def run(site_data):
 
-    robots_txt = site_data.robots_txt or ""
+    robots_txt = getattr(site_data, 'robots_txt', "")
 
     score = 0
     details = {}
@@ -115,7 +115,7 @@ def run(site_data):
     final_score = min(score, 100)
 
     return MetricResult(
-        factor="Metric 70 - AI Crawler Access",
+        factor="Metric 170 - AI Crawler Access",
         score=final_score,
         status=get_status(final_score),
         details=details,

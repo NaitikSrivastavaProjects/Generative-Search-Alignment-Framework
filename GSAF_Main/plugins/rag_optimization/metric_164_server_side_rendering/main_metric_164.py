@@ -113,7 +113,7 @@ def run(site_data):
         )
 
     return MetricResult(
-        factor="Metric 64 - Server Side Rendering",
+        factor="Metric 164 - Server Side Rendering",
         score=min(score, 100),
         status=get_status(min(score, 100)),
         details=details,

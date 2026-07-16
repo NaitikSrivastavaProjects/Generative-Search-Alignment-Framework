@@ -1,7 +1,7 @@
 from models.metric_result import MetricResult
 
 def run(site_data):
-    result = MetricResult(factor="35 - Date Published & Modified")
+    result = MetricResult(factor="135 - Date Published & Modified")
     result.score = 0
     result.status = "Failed"
     result.details = {

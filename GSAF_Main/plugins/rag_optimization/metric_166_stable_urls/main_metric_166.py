@@ -120,7 +120,7 @@ def run(site_data):
         score += 15
 
     return MetricResult(
-        factor="Metric 66 - Stable URL Structure",
+        factor="Metric 166 - Stable URL Structure",
         score=min(score, 100),
         status=get_status(min(score, 100)),
         details=details,

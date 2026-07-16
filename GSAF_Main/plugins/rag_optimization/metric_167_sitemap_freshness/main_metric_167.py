@@ -107,7 +107,7 @@ def run(site_data):
         )
 
     return MetricResult(
-        factor="Metric 67 - Content Freshness",
+        factor="Metric 167 - Content Freshness",
         score=min(score, 100),
         status=get_status(min(score, 100)),
         details=details,

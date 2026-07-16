@@ -142,7 +142,7 @@ def run(site_data):
     final_score = min(score, 100)
 
     return MetricResult(
-        factor="Metric 68 - Page Size Reasonable",
+        factor="Metric 168 - Page Size Reasonable",
         score=final_score,
         status=get_status(final_score),
         details=details,

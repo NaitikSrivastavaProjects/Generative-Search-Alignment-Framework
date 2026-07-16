@@ -145,7 +145,7 @@ def run(site_data):
         )
 
     return MetricResult(
-        factor="Metric 61 - Clean Crawlable HTML",
+        factor="Metric 161 - Clean Crawlable HTML",
         score=min(score, 100),
         status=get_status(min(score, 100)),
         details=details,

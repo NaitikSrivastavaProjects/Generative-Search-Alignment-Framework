@@ -150,7 +150,7 @@ def run(site_data):
         )
 
     return MetricResult(
-        factor="Metric 62 - Robots.txt Accessibility",
+        factor="Metric 162 - Robots.txt Accessibility",
         score=min(score, 100),
         status=get_status(min(score, 100)),
         details=details,
