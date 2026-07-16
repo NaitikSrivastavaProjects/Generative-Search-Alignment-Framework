@@ -7,67 +7,54 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 
+from models.metric_result import MetricResult
+
 
 # Function: checks LinkedIn company page presence on a website
-def check_linkedin_page(context):
+def check_linkedin_page(site_data):
+    page_url = site_data.url
+    result = MetricResult(factor="Official LinkedIn Company Page")
 
-    # Get website URL from shared context (from main.py)
-    page_url = context["url"]
+    if not page_url:
+        result.status = "Error"
+        result.score = 0
+        result.error = "URL missing"
+        return result.to_dict()
 
     try:
-        # Send HTTP request to fetch website HTML content
         response = requests.get(
             page_url,
             headers={"User-Agent": "Mozilla/5.0"},
             timeout=10
         )
-
-        # Raise error if request fails (404, 403, etc.)
         response.raise_for_status()
 
-        # Parse HTML content using BeautifulSoup
         soup = BeautifulSoup(response.text, "html.parser")
-
-        # Flag to track LinkedIn company page presence
         linkedin_found = False
 
-        # Loop through all anchor tags (<a href="...">)
         for link in soup.find_all("a", href=True):
-
-            # Convert relative URLs to absolute URLs
             href = urljoin(page_url, link["href"])
-
-            # Detect LinkedIn company page links
             if "linkedin.com/company" in href.lower():
                 linkedin_found = True
                 break
 
-        # Decide final status based on detection
         if linkedin_found:
-            status = "Found"
-            score = 100
+            result.status = "Found"
+            result.score = 100
         else:
-            status = "Not Found"
-            score = 0
+            result.status = "Not Found"
+            result.score = 0
 
     except Exception as e:
-        # Handle errors like network issues or invalid URL
-        return {
-            "factor": "Official LinkedIn Company Page",
-            "status": "Error",
-            "score": 0,
-            "error": str(e)
-        }
+        result.status = "Error"
+        result.score = 0
+        result.error = str(e)
 
-    # Return final structured result
-    return {
-        "factor": "Official LinkedIn Company Page",
-        "status": status,
-        "score": score
-    }
+    return result.to_dict()
 
-def run(context):
-    return check_linkedin_page(context)
+
+def run(site_data):
+    return check_linkedin_page(site_data)
 # ---------------------------------------------------
 # Individual Testing (run file directly)
 # ---------------------------------------------------

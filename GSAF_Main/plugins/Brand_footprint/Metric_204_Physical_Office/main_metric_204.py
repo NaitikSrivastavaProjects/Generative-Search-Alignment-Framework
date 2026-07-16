@@ -7,15 +7,21 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
+from models.metric_result import MetricResult
+
 
 # Function: checks for a physical office address
-def check_physical_brick_and_mortar_office(context):
+def check_physical_brick_and_mortar_office(site_data):
+    page_url = site_data.url
+    result = MetricResult(factor="Physical Brick-and-Mortar Office")
 
-    # Get website URL from shared context
-    page_url = context["url"]
+    if not page_url:
+        result.status = "Error"
+        result.score = 0
+        result.error = "URL missing"
+        return result.to_dict()
 
     try:
-        # Send HTTP request
         response = requests.get(
             page_url,
             headers={"User-Agent": "Mozilla/5.0"},
@@ -23,14 +29,9 @@ def check_physical_brick_and_mortar_office(context):
         )
 
         response.raise_for_status()
-
-        # Parse HTML
         soup = BeautifulSoup(response.text, "html.parser")
-
-        # Extract all visible text
         page_text = soup.get_text(" ", strip=True)
 
-        # Common address-related keywords
         keywords = [
             "address",
             "office",
@@ -46,7 +47,6 @@ def check_physical_brick_and_mortar_office(context):
             for keyword in keywords
         )
 
-        # Simple street address pattern
         address_pattern = re.compile(
             r"\d{1,6}\s+[A-Za-z0-9\s,.-]+"
         )
@@ -54,28 +54,22 @@ def check_physical_brick_and_mortar_office(context):
         address_found = bool(address_pattern.search(page_text))
 
         if keyword_found or address_found:
-            status = "Found"
-            score = 100
+            result.status = "Found"
+            result.score = 100
         else:
-            status = "Not Found"
-            score = 0
+            result.status = "Not Found"
+            result.score = 0
 
     except Exception as e:
-        return {
-            "factor": "Physical Brick-and-Mortar Office",
-            "status": "Error",
-            "score": 0,
-            "error": str(e)
-        }
+        result.status = "Error"
+        result.score = 0
+        result.error = str(e)
 
-    return {
-        "factor": "Physical Brick-and-Mortar Office",
-        "status": status,
-        "score": score
-    }
+    return result.to_dict()
 
-def run(context):
-    return check_physical_brick_and_mortar_office(context)
+
+def run(site_data):
+    return check_physical_brick_and_mortar_office(site_data)
 # ---------------------------------------------------
 # Individual Testing
 # ---------------------------------------------------

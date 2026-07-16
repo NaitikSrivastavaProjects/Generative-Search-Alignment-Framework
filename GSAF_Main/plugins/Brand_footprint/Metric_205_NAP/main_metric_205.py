@@ -7,6 +7,8 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
+from models.metric_result import MetricResult
+
 
 # -----------------------------
 # Phone number pattern (global formats)
@@ -28,21 +30,19 @@ ADDRESS_KEYWORDS = [
 # -----------------------------
 # Checker function
 # -----------------------------
-def check_nap_consistency(context):
+def check_nap_consistency(site_data):
+    page_url = site_data.url
+    result = MetricResult(factor="NAP Consistency")
 
-    url = context.get("url", "")
-
-    if not url:
-        return {
-            "factor": "NAP Consistency",
-            "status": "Error",
-            "score": 0,
-            "error": "URL missing"
-        }
+    if not page_url:
+        result.status = "Error"
+        result.score = 0
+        result.error = "URL missing"
+        return result.to_dict()
 
     try:
         response = requests.get(
-            url,
+            page_url,
             headers={"User-Agent": "Mozilla/5.0"},
             timeout=10
         )
@@ -52,29 +52,17 @@ def check_nap_consistency(context):
         soup = BeautifulSoup(response.text, "html.parser")
         text = soup.get_text(" ", strip=True).lower()
 
-        # -----------------------------
-        # Check Phone
-        # -----------------------------
         phone_match = PHONE_PATTERN.search(text)
         phone_found = bool(phone_match)
 
-        # -----------------------------
-        # Check Address keywords
-        # -----------------------------
         address_found = any(
             keyword in text
             for keyword in ADDRESS_KEYWORDS
         )
 
-        # -----------------------------
-        # Check Name (basic heuristic)
-        # -----------------------------
         title = soup.title.string.strip().lower() if soup.title else ""
         name_found = bool(title)
 
-        # -----------------------------
-        # Score calculation
-        # -----------------------------
         score = 0
         if name_found:
             score += 30
@@ -92,25 +80,22 @@ def check_nap_consistency(context):
         else:
             status = "Weak NAP"
 
-        return {
-            "factor": "NAP Consistency",
-            "status": status,
-            "score": score,
-            "name_found": name_found,
-            "address_found": address_found,
-            "phone_found": phone_found
-        }
+        result.status = status
+        result.score = score
+        result.details["name_found"] = name_found
+        result.details["address_found"] = address_found
+        result.details["phone_found"] = phone_found
 
     except Exception as e:
-        return {
-            "factor": "NAP Consistency",
-            "status": "Error",
-            "score": 0,
-            "error": str(e)
-        }
+        result.status = "Error"
+        result.score = 0
+        result.error = str(e)
 
-def run(context):
-    return check_nap_consistency(context)
+    return result.to_dict()
+
+
+def run(site_data):
+    return check_nap_consistency(site_data)
 # -----------------------------
 # Independent testing
 # -----------------------------
