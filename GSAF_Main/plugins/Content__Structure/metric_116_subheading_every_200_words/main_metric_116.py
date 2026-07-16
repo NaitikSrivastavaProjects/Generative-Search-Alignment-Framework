@@ -8,7 +8,7 @@ from utils.subheading_density import (
 def run(site_data):
 
     result = MetricResult(
-        factor="16 - Subheading Every 200-300 Words"
+        factor="116 - Subheading Every 200-300 Words"
     )
 
     try:

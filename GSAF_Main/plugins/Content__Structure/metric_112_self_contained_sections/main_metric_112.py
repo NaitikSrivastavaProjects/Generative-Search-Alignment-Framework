@@ -8,7 +8,7 @@ from utils.self_contained_sections import (
 def run(site_data):
 
     result = MetricResult(
-        factor="12 - Self-Contained Sections"
+        factor="112 - Self-Contained Sections"
     )
 
     try:

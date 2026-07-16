@@ -6,7 +6,7 @@ from utils.semantic_html import analyze_semantic_html
 def run(site_data):
 
     result = MetricResult(
-        factor="11 - Clear Semantic HTML"
+        factor="111 - Clear Semantic HTML"
     )
 
     try:

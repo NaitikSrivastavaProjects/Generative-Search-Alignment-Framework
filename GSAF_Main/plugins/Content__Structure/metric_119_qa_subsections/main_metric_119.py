@@ -6,7 +6,7 @@ from utils.qa_subsections import analyze_qa_subsections
 def run(site_data):
 
     result = MetricResult(
-        factor="19 - Q&A Subsections"
+        factor="119 - Q&A Subsections"
     )
 
     try:

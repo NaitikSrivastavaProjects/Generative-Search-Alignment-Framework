@@ -4,18 +4,21 @@ Factor 222
 Google Analytics & Search Console
 """
 
-from utils.core.base_seo_plugin import BaseSEOPlugin
+from models.metric_result import MetricResult
 
 
-class GoogleAnalyticsPlugin(BaseSEOPlugin):
+def run(site_data):
+    result = MetricResult(factor="222 - Google Analytics & Search Console")
 
-    @property
-    def factor(self):
-        return "222 - Google Analytics & Search Console"
+    if not hasattr(site_data, 'soup') or not site_data.soup:
+        result.error = "Parsed HTML (soup) not found in site_data"
+        result.status = "Error"
+        result.score = 0
+        return result.to_dict()
 
-    def run(self):
-        result = self.create_result()
-        _, soup = self.fetch_html()
+    try:
+        soup = site_data.soup
+        raw_html = getattr(site_data, 'raw_html', str(soup)).lower()
 
         analytics_found = False
         search_console_found = False
@@ -27,9 +30,15 @@ class GoogleAnalyticsPlugin(BaseSEOPlugin):
                 search_console_found = True
 
         score = 100 if analytics_found and search_console_found else 70 if analytics_found or search_console_found else 0
-        self.set_score(result, score)
-        result.update({
-            "google_analytics_found": analytics_found,
-            "google_search_console_found": search_console_found,
-        })
-        return result
+        result.score = score
+        result.status = "Found" if score == 100 else "Partial" if score > 0 else "Not Found"
+        result.details["google_analytics_found"] = analytics_found
+        result.details["google_search_console_found"] = search_console_found
+        result.details["raw_html_available"] = bool(raw_html)
+
+    except Exception as e:
+        result.error = str(e)
+        result.status = "Error"
+        result.score = 0
+
+    return result.to_dict()

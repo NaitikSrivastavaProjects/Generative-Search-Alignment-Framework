@@ -6,7 +6,7 @@ from utils.list_structure import analyze_list_structure
 def run(site_data):
 
     result = MetricResult(
-        factor="14 - Bullet Points & Numbered Lists"
+        factor="114 - Bullet Points & Numbered Lists"
     )
 
     try:

@@ -3,7 +3,7 @@ from utils.helpers import get_status
 
 
 def run(site_data):
-    result = MetricResult(factor="186 - Low-Quality Directory Backlinks")
+    result = MetricResult(factor="286 - Low-Quality Directory Backlinks")
 
     if not site_data.opr_data:
         result.error = "Open PageRank API key not configured"

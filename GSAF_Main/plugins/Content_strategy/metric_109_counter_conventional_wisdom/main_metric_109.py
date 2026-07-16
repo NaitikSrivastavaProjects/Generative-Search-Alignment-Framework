@@ -6,7 +6,7 @@ from utils.counter_conventional import analyze_counter_conventional
 def run(site_data):
 
     result = MetricResult(
-        factor="09 - Counter Conventional Wisdom"
+        factor="109 - Counter Conventional Wisdom"
     )
 
     try:

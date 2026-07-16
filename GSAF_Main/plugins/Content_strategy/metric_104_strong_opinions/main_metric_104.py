@@ -6,7 +6,7 @@ from utils.opinion import analyze_opinions
 def run(site_data):
 
     result = MetricResult(
-        factor="04 - Strong Opinions & Hot Takes"
+        factor="104 - Strong Opinions & Hot Takes"
     )
 
     try:

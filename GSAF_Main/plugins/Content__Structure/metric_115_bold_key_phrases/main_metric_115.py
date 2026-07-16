@@ -6,7 +6,7 @@ from utils.bold_key_phrases import analyze_bold_key_phrases
 def run(site_data):
 
     result = MetricResult(
-        factor="15 - Bold Key Phrases"
+        factor="115 - Bold Key Phrases"
     )
 
     try:

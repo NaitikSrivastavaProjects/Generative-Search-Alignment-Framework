@@ -7,7 +7,7 @@ from utils.statistics import analyze_statistics
 def run(site_data):
   
     result = MetricResult(
-        factor="01 - Original Statistics & Data"
+        factor="101 - Original Statistics & Data"
     )
 
     try:

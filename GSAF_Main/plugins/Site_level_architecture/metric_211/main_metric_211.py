@@ -4,31 +4,44 @@ Factor 98
 Sitemap Availability
 """
 
-from utils.core.base_seo_plugin import BaseSEOPlugin
+from models.metric_result import MetricResult
 from utils.keywords import SITEMAP_KEYWORDS
-from utils.helpers import get_link_targets
 
 
-class SitemapAvailabilityPlugin(BaseSEOPlugin):
+def run(site_data):
+    result = MetricResult(factor="211 - Sitemap Availability")
 
-    @property
-    def factor(self):
-        return "211 - Sitemap Availability"
+    if not hasattr(site_data, 'soup') or not site_data.soup:
+        result.error = "Parsed HTML (soup) not found in site_data"
+        result.status = "Error"
+        result.score = 0
+        return result.to_dict()
 
-    def run(self):
-        result = self.create_result()
-        _, soup = self.fetch_html()
-        links = get_link_targets(soup, self.url)
+    try:
+        soup = site_data.soup
+        raw_html = getattr(site_data, 'raw_html', str(soup)).lower()
+        links = []
+        for link in soup.find_all("a", href=True):
+            href = link.get("href", "")
+            text = link.get_text(" ", strip=True)
+            links.append({"href": href, "text": text})
 
         sitemap_found = any(
             keyword in link["text"] or keyword in link["href"]
             for link in links
             for keyword in SITEMAP_KEYWORDS
-        )
+        ) or any(keyword in raw_html for keyword in SITEMAP_KEYWORDS)
+
         score = 100 if sitemap_found else 0
-        self.set_score(result, score)
-        result.update({
-            "sitemap_found": sitemap_found,
-            "links_checked": len(links),
-        })
-        return result
+        result.score = score
+        result.status = "Found" if score == 100 else "Not Found"
+        result.details["sitemap_found"] = sitemap_found
+        result.details["links_checked"] = len(links)
+        result.details["raw_html_available"] = bool(raw_html)
+
+    except Exception as e:
+        result.error = str(e)
+        result.status = "Error"
+        result.score = 0
+
+    return result.to_dict()

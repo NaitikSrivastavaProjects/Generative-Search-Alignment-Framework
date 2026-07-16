@@ -4,7 +4,7 @@ from utils.helpers import get_status
 
 
 def run(site_data):
-    result = MetricResult(factor="196 - AI Footprints")
+    result = MetricResult(factor="296 - AI Footprints")
 
     try:
         soup = site_data.soup

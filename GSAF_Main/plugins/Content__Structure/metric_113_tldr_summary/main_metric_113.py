@@ -6,7 +6,7 @@ from utils.tldr_summary import analyze_tldr_summary
 def run(site_data):
 
     result = MetricResult(
-        factor="13 - TL;DR Summary at Top"
+        factor="113 - TL;DR Summary at Top"
     )
 
     try:

@@ -6,7 +6,7 @@ from utils.glossary import analyze_glossary
 def run(site_data):
 
     result = MetricResult(
-        factor="20 - Glossaries"
+        factor="120 - Glossaries"
     )
 
     try:

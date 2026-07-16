@@ -6,7 +6,7 @@ from utils.comparison_framework import analyze_comparison_framework
 def run(site_data):
 
     result = MetricResult(
-        factor="08 - Comparison Frameworks"
+        factor="108 - Comparison Frameworks"
     )
 
     try:

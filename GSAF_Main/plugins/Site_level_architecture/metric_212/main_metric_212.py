@@ -4,21 +4,33 @@ Factor 212
 Site Uptime
 """
 
-from utils.core.base_seo_plugin import BaseSEOPlugin
+from models.metric_result import MetricResult
 
 
-class SiteUptimePlugin(BaseSEOPlugin):
+def run(site_data):
+    result = MetricResult(factor="212 - Site Uptime")
 
-    @property
-    def factor(self):
-        return "212- Site Uptime"
+    if not hasattr(site_data, 'soup') or not site_data.soup:
+        result.error = "Parsed HTML (soup) not found in site_data"
+        result.status = "Error"
+        result.score = 0
+        return result.to_dict()
 
-    def run(self):
-        result = self.create_result()
-        response, _ = self.fetch_html()
-        score = 100 if response.status_code < 400 else 0
-        self.set_score(result, score)
-        result.update({
-            "status_code": response.status_code,
-        })
-        return result
+    try:
+        soup = site_data.soup
+        raw_html = getattr(site_data, 'raw_html', str(soup)).lower()
+        response = getattr(site_data, 'response', None)
+        status_code = getattr(response, 'status_code', 0) if response is not None else 0
+        score = 100 if status_code < 400 else 0
+
+        result.score = score
+        result.status = "Found" if score == 100 else "Not Found"
+        result.details["status_code"] = status_code
+        result.details["raw_html_available"] = bool(raw_html)
+
+    except Exception as e:
+        result.error = str(e)
+        result.status = "Error"
+        result.score = 0
+
+    return result.to_dict()

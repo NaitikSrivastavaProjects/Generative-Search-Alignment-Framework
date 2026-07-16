@@ -6,7 +6,7 @@ from utils.structured_tables import analyze_structured_tables
 def run(site_data):
 
     result = MetricResult(
-        factor="18 - Structured Comparison Tables"
+        factor="118 - Structured Comparison Tables"
     )
 
     try:

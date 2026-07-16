@@ -6,7 +6,7 @@ from utils.case_study import analyze_case_studies
 def run(site_data):
 
     result = MetricResult(
-        factor="07 - Case Studies with Numbers"
+        factor="107 - Case Studies with Numbers"
     )
 
     try:

@@ -6,7 +6,7 @@ from utils.research import analyze_research
 def run(site_data):
 
     result = MetricResult(
-        factor="02 - Named Studies & Research"
+        factor="102 - Named Studies & Research"
     )
 
     try:

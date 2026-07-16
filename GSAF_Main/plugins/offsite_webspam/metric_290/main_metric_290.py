@@ -19,7 +19,7 @@ def get_domain_age_months(domain):
 
 
 def run(site_data):
-    result = MetricResult(factor="190 - Google Sandbox")
+    result = MetricResult(factor="290 - Google Sandbox")
 
     try:
         age_months = get_domain_age_months(site_data.domain)

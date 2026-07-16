@@ -19,7 +19,7 @@ def get_domain_age_months(domain):
 
 
 def run(site_data):
-    result = MetricResult(factor="184 - Sudden Link Influx")
+    result = MetricResult(factor="284 - Sudden Link Influx")
 
     if not site_data.opr_data:
         result.error = "Open PageRank API key not configured"

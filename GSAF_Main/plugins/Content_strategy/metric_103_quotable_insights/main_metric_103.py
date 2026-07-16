@@ -6,7 +6,7 @@ from utils.quotable import analyze_quotable_insights
 def run(site_data):
 
     result = MetricResult(
-        factor="03 - Quotable Insights"
+        factor="103 - Quotable Insights"
     )
 
     try:

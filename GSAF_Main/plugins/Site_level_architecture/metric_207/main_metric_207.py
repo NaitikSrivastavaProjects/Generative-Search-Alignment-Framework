@@ -4,21 +4,25 @@ Detects contact links, emails, and phone numbers.
 """
 
 import re
-import requests
-from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from models.metric_result import MetricResult
 
 def run(site_data):
     result = MetricResult(factor="207 - Contact Us Page")
 
+    # Early Exit: Ensure parsed HTML exists from the central fetcher
+    if not hasattr(site_data, 'soup') or not site_data.soup:
+        result.error = "Parsed HTML (soup) not found in site_data"
+        result.status = "Error"
+        result.score = 0
+        return result.to_dict()
+
     try:
-        page_url = site_data.url
+        page_url = getattr(site_data, 'url', '')
         
-        # Fetch and parse HTML (replacing self.fetch_html())
-        response = requests.get(page_url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.text, "html.parser")
+        # Pull the already-fetched and parsed HTML
+        soup = site_data.soup
+        raw_html = getattr(site_data, 'raw_html', str(soup)).lower()
 
         links = soup.find_all("a", href=True)
         contact_found = False
@@ -32,10 +36,20 @@ def run(site_data):
                 result.details["contact_page"] = urljoin(page_url, link["href"])
                 break
 
-        page = soup.get_text(" ")
+        page_text = soup.get_text(" ")
 
-        email = re.search(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", page)
-        phone = re.search(r"\+?\d[\d\s\-\(\)]{7,}", page)
+        email = bool(re.search(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", page_text))
+        phone = bool(re.search(r"\+?\d[\d\s\-\(\)]{7,}", page_text))
+
+        # Minimal fallbacks using the pre-fetched raw HTML
+        if not contact_found and "contact" in raw_html:
+            contact_found = True
+
+        if not email and "mailto:" in raw_html:
+            email = True
+
+        if not phone and "tel:" in raw_html:
+            phone = True
 
         score = 0
         if contact_found:
@@ -47,7 +61,7 @@ def run(site_data):
 
         result.score = score
         
-        # Adding a basic status fallback based on the score
+        # Basic status fallback based on the score
         if score >= 70:
             result.status = "Found"
         elif score > 0:
@@ -56,10 +70,12 @@ def run(site_data):
             result.status = "Not Found"
 
         result.details["contact_found"] = contact_found
-        result.details["email_found"] = bool(email)
-        result.details["phone_found"] = bool(phone)
+        result.details["email_found"] = email
+        result.details["phone_found"] = phone
 
     except Exception as e:
         result.error = str(e)
+        result.status = "Error"
+        result.score = 0
 
     return result.to_dict()

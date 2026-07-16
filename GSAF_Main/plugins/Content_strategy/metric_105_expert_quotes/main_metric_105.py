@@ -6,7 +6,7 @@ from utils.expert_quotes import analyze_expert_quotes
 def run(site_data):
 
     result = MetricResult(
-        factor="05 - Expert Quotes"
+        factor="105 - Expert Quotes"
     )
 
     try:

@@ -6,7 +6,7 @@ from utils.experience import analyze_first_hand_experience
 def run(site_data):
 
     result = MetricResult(
-        factor="06 - First-Hand Experience"
+        factor="106 - First-Hand Experience"
     )
 
     try:

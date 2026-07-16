@@ -3,7 +3,7 @@ from utils.helpers import get_status
 
 
 def run(site_data):
-    result = MetricResult(factor="193 - Toxic Backlink Injections")
+    result = MetricResult(factor="293 - Toxic Backlink Injections")
 
     if not site_data.opr_data:
         result.error = "Open PageRank API key not configured"

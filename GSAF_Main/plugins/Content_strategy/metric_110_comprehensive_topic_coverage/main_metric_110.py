@@ -6,7 +6,7 @@ from utils.topic_coverage import analyze_topic_coverage
 def run(site_data):
 
     result = MetricResult(
-        factor="10 - Comprehensive Topic Coverage"
+        factor="110 - Comprehensive Topic Coverage"
     )
 
     try:

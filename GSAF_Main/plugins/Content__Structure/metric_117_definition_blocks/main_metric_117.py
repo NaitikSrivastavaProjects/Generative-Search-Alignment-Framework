@@ -6,7 +6,7 @@ from utils.definition_blocks import analyze_definition_blocks
 def run(site_data):
 
     result = MetricResult(
-        factor="17 - Definition Blocks"
+        factor="117 - Definition Blocks"
     )
 
     try:

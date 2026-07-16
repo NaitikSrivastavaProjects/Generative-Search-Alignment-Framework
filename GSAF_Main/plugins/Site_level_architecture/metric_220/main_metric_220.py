@@ -4,26 +4,35 @@ Factor 220
 Site Usability
 """
 
-from utils.core.base_seo_plugin import BaseSEOPlugin
+from models.metric_result import MetricResult
 from utils.helpers import get_link_targets
 
 
-class SiteUsabilityPlugin(BaseSEOPlugin):
+def run(site_data):
+    result = MetricResult(factor="220 - Site Usability")
 
-    @property
-    def factor(self):
-        return "220 - Site Usability"
+    if not hasattr(site_data, 'soup') or not site_data.soup:
+        result.error = "Parsed HTML (soup) not found in site_data"
+        result.status = "Error"
+        result.score = 0
+        return result.to_dict()
 
-    def run(self):
-        result = self.create_result()
-        _, soup = self.fetch_html()
-        links = get_link_targets(soup, self.url)
+    try:
+        soup = site_data.soup
+        raw_html = getattr(site_data, 'raw_html', str(soup)).lower()
+        links = get_link_targets(soup, getattr(site_data, 'url', ''))
 
         nav_links = [link for link in links if len(link["text"].split()) <= 3]
         score = 70 if nav_links else 30
-        self.set_score(result, score)
-        result.update({
-            "navigation_links_found": len(nav_links),
-            "total_links_found": len(links),
-        })
-        return result
+        result.score = score
+        result.status = "Found" if score >= 70 else "Partial" if score > 0 else "Not Found"
+        result.details["navigation_links_found"] = len(nav_links)
+        result.details["total_links_found"] = len(links)
+        result.details["raw_html_available"] = bool(raw_html)
+
+    except Exception as e:
+        result.error = str(e)
+        result.status = "Error"
+        result.score = 0
+
+    return result.to_dict()
