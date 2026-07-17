@@ -59,16 +59,18 @@ def get_display_category(cluster_name: str) -> str:
     return CLUSTER_DISPLAY_NAMES.get(cluster_name.lower(), cluster_name.replace("_", " ").title())
 
 
-def map_status(status: str) -> str:
-    mapping = {
-        "Good": "Good",
-        "Average": "Warning",
-        "Poor": "Critical",
-        "Not Applicable": "Informational",
-        "Informational": "Informational",
-        "Error": "Error"
-    }
-    return mapping.get(status, "Informational")
+def map_status(status: str, score=None) -> str:
+    if status == "Error":
+        return "Error"
+    if status == "Not Applicable":
+        return "Informational"
+    if score is None:
+        return "Informational"
+    if score >= 75:
+        return "Good"
+    if score >= 40:
+        return "Warning"
+    return "Critical"
 
 
 def build_assessment(result: dict) -> str:
@@ -173,7 +175,7 @@ def analyze(request: AnalyzeRequest):
             shaped_results.append({
                 "factor": r.get("factor", "Unknown"),
                 "score": r.get("score"),
-                "status": map_status(r.get("status", "Informational")),
+                "status": map_status(r.get("status", "Informational"), r.get("score")),
                 "category": category,
                 "assessment": build_assessment(r),
                 "recommendations": r.get("recommendations", []),
