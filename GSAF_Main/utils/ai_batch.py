@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env")
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent"
 
 nlp = spacy.load("en_core_web_sm")
 
@@ -124,7 +124,7 @@ ANSWER ALL QUESTIONS:
 
 4. metric_65 (Original Research): Based on the originality signals, rate the likelihood this contains original research or proprietary data as High, Medium, or Low with one line of reasoning.
 
-5. metric_196 (AI Footprints): Based on the content pattern signals (sentence variance, pronoun frequency, anecdote count), rate the likelihood this is mass-produced AI-generated content as High, Medium, or Low with one line of reasoning.
+5. metric_296 (AI Footprints): Based on the content pattern signals (sentence variance, pronoun frequency, anecdote count), rate the likelihood this is mass-produced AI-generated content as High, Medium, or Low with one line of reasoning.
 
 Respond in this exact JSON format:
 {{
@@ -132,7 +132,7 @@ Respond in this exact JSON format:
   "metric_60": {{"disambiguates": true, "reasoning": ""}},
   "metric_63": {{"citation_quality": "High/Medium/Low", "reasoning": ""}},
   "metric_65": {{"originality": "High/Medium/Low", "reasoning": ""}},
-  "metric_196": {{"ai_likelihood": "High/Medium/Low", "reasoning": ""}}
+  "metric_296": {{"ai_likelihood": "High/Medium/Low", "reasoning": ""}}
 }}"""
 
     try:
@@ -143,7 +143,12 @@ Respond in this exact JSON format:
             timeout=30
         )
         raw = response.json()
-        text = raw["candidates"][0]["content"]["parts"][0]["text"].strip()
+        candidates = raw.get("candidates", [])
+        if not candidates:
+            print(f"AI batch error: no candidates in response - {raw.get('promptFeedback', '')}")
+            print(f"Full response: {raw}")
+            return {}
+        text = candidates[0]["content"]["parts"][0]["text"].strip()
 
         # strip markdown code fences if Gemini adds them
         text = re.sub(r"```json|```", "", text).strip()
